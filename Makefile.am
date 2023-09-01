@@ -7,7 +7,10 @@ SUBDIRS = src doc tests
 
 ACLOCAL_AMFLAGS = -I m4
 
-@CODE_COVERAGE_RULES@
+include $(top_srcdir)/aminclude_static.am
+
+clean-local: code-coverage-clean
+distclean-local: code-coverage-dist-clean
 
 CODE_COVERAGE_LCOV_RMOPTS_DEFAULT = --ignore-errors unused
 CODE_COVERAGE_GENHTML_OPTIONS_DEFAULT = --ignore-errors unmapped

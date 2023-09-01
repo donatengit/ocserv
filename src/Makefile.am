@@ -25,7 +25,7 @@ CORE_LDADD += $(LIBGNUTLS_LIBS) $(PAM_LIBS) $(LIBUTIL) \
 	$(RADCLI_LIBS) $(LIBLZ4_LIBS) $(LIBKRB5_LIBS) \
 	$(LIBTASN1_LIBS) $(LIBOATH_LIBS) $(LIBNETTLE_LIBS) \
 	$(LIBEV_LIBS) libipc.a $(NEEDED_LIBPROTOBUF_LIBS) \
-	$(CODE_COVERAGE_LDFLAGS)
+	$(CODE_COVERAGE_LIBS)
 
 if LOCAL_HTTP_PARSER
 HTTP_PARSER_SOURCES = http-parser/http_parser.c http-parser/http_parser.h
@@ -138,7 +138,7 @@ endif
 
 occtl_occtl_LDADD = libcommon.a $(LIBREADLINE_LIBS) \
 	$(LIBNL3_LIBS) $(NEEDED_LIBPROTOBUF_LIBS) $(LIBTALLOC_LIBS) libccan.a \
-	libipc.a $(NEEDED_LIBPROTOBUF_LIBS) $(CODE_COVERAGE_LDFLAGS) \
+	libipc.a $(NEEDED_LIBPROTOBUF_LIBS) $(CODE_COVERAGE_LIBS) \
 	$(LIBNETTLE_LIBS) $(MAXMIND_LIBS) $(GEOIP_LIBS)
 
 # Ocpasswd
@@ -148,7 +148,7 @@ bin_PROGRAMS += ocpasswd/ocpasswd
 ocpasswd_ocpasswd_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/ocpasswd
 ocpasswd_ocpasswd_SOURCES = ocpasswd/ocpasswd.c
 ocpasswd_ocpasswd_LDADD = 
-ocpasswd_ocpasswd_LDADD += $(LIBGNUTLS_LIBS) $(LIBCRYPT) $(CODE_COVERAGE_LDFLAGS) \
+ocpasswd_ocpasswd_LDADD += $(LIBGNUTLS_LIBS) $(LIBCRYPT) $(CODE_COVERAGE_LIBS) \
 	$(LIBNETTLE_LIBS)
 
 

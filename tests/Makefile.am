@@ -130,7 +130,7 @@ AM_CPPFLAGS += \
 	-I$(top_srcdir)/ \
 	-I$(top_builddir)/
 
-LDADD = $(LIBTALLOC_LIBS) ../src/libccan.a $(CODE_COVERAGE_LDFLAGS)
+LDADD = $(LIBTALLOC_LIBS) ../src/libccan.a $(CODE_COVERAGE_LIBS)
 
 kkdcp_parsing_SOURCES = kkdcp-parsing.c
 kkdcp_parsing_LDADD = $(LDADD)
