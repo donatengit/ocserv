@@ -65,6 +65,11 @@ if test "${NEED_SOCKET_WRAPPER}" = 1 || test "${NO_NEED_ROOT}" = 1;then
 	fi
 fi
 
+OC_OPTIONS=""
+if test "${COVERAGE}" = "1";then
+	OPTIONS="${OC_OPTIONS} -x"
+fi
+
 update_config() {
 	file=$1
 	username=$(whoami)
@@ -107,9 +112,9 @@ fail() {
 
 launch_server() {
 	if test -n "${VERBOSE}" && test "${VERBOSE}" -ge 1;then
-	    $SERV $* -d 3 &
+	    $SERV ${OC_OPTIONS} $* -d 3 &
 	else
-	    $SERV $* >/dev/null 2>&1 &
+	    $SERV ${OC_OPTIONS} $* >/dev/null 2>&1 &
 	fi
 	LOCALPID="$!";
 	trap "[ ! -z \"${LOCALPID}\" ] && kill ${LOCALPID};" 15
@@ -123,9 +128,9 @@ launch_server() {
 
 launch_sr_server() {
 	if test -n "${VERBOSE}" && test "${VERBOSE}" -ge 1;then
-		LD_PRELOAD=libsocket_wrapper.so:libuid_wrapper.so UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $SERV $* -d 3 &
+		LD_PRELOAD=libsocket_wrapper.so:libuid_wrapper.so UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $SERV ${OC_OPTIONS} $* -d 3 &
 	else
-		LD_PRELOAD=libsocket_wrapper.so:libuid_wrapper.so UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $SERV $* >/dev/null 2>&1 &
+		LD_PRELOAD=libsocket_wrapper.so:libuid_wrapper.so UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $SERV ${OC_OPTIONS} $* >/dev/null 2>&1 &
 	fi
 	LOCALPID="$!";
 	trap "[ ! -z \"${LOCALPID}\" ] && kill ${LOCALPID};" 15
@@ -159,9 +164,9 @@ launch_pam_server() {
 		SR="libsocket_wrapper.so:"
 	fi
 	if test -n "${VERBOSE}" && test "${VERBOSE}" -ge 1;then
-		LD_PRELOAD=libnss_wrapper.so:${SR}libpam_wrapper.so:libuid_wrapper.so PAM_WRAPPER=1 UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $PRELOAD_CMD $SERV $* &
+		LD_PRELOAD=libnss_wrapper.so:${SR}libpam_wrapper.so:libuid_wrapper.so PAM_WRAPPER=1 UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $PRELOAD_CMD $SERV ${OC_OPTIONS} $* &
 	else
-		LD_PRELOAD=libnss_wrapper.so:${SR}libpam_wrapper.so:libuid_wrapper.so PAM_WRAPPER=1 UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $PRELOAD_CMD $SERV $* >/dev/null 2>&1 &
+		LD_PRELOAD=libnss_wrapper.so:${SR}libpam_wrapper.so:libuid_wrapper.so PAM_WRAPPER=1 UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $PRELOAD_CMD $SERV ${OC_OPTIONS} $* >/dev/null 2>&1 &
 	fi
 	LOCALPID="$!";
 	unset NSS_WRAPPER_PASSWD
@@ -181,22 +186,22 @@ launch_sr_pam_server() {
 
 launch_simple_sr_server() {
 	if test -n "${VERBOSE}" && test "${VERBOSE}" -ge 1;then
-		LD_PRELOAD=libsocket_wrapper.so:libuid_wrapper.so UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $SERV $* -d 3 &
+		LD_PRELOAD=libsocket_wrapper.so:libuid_wrapper.so UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $SERV ${OC_OPTIONS} $* -d 3 &
 	else
-		LD_PRELOAD=libsocket_wrapper.so:libuid_wrapper.so UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $SERV $* >/dev/null 2>&1 &
+		LD_PRELOAD=libsocket_wrapper.so:libuid_wrapper.so UID_WRAPPER=1 UID_WRAPPER_ROOT=1 $SERV ${OC_OPTIONS} $* >/dev/null 2>&1 &
 	fi
 }
 
 launch_simple_server() {
 	if test -n "${VERBOSE}" && test "${VERBOSE}" -ge 1;then
-		$PRELOAD_CMD $SERV $* &
+		$PRELOAD_CMD $SERV ${OC_OPTIONS} $* &
 	else
-		$PRELOAD_CMD $SERV $* >/dev/null 2>&1 &
+		$PRELOAD_CMD $SERV ${OC_OPTIONS} $* >/dev/null 2>&1 &
 	fi
 }
 
 launch_debug_server() {
-	valgrind --leak-check=full $SERV $* >out.txt 2>&1 &
+	valgrind --leak-check=full $SERV ${OC_OPTIONS} $* >out.txt 2>&1 &
 	LOCALPID="$!";
 	trap "[ ! -z \"${LOCALPID}\" ] && kill ${LOCALPID};" 15
 	wait "${LOCALPID}"
