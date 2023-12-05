@@ -1109,6 +1109,9 @@ int common_info_cmd(UserListRep * args, FILE *out, cmd_params_st *params)
 		fprintf(out, "[\n");
 
 	for (i=0;i<args->n_user;i++) {
+		char buf1[32];
+		char buf2[32];
+
 		if (at_least_one > 0)
 			fprintf(out, "\n");
 
@@ -1151,24 +1154,15 @@ int common_info_cmd(UserListRep * args, FILE *out, cmd_params_st *params)
 
 		print_single_value(out, params, "User-Agent", args->user[i]->user_agent, 1);
 
-		if (args->user[i]->rx_per_sec > 0 || args->user[i]->tx_per_sec > 0) {
-			/* print limits */
-			char buf1[32];
-			char buf2[32];
-
-			if (args->user[i]->rx_per_sec > 0 && args->user[i]->tx_per_sec > 0) {
-				bytes2human(args->user[i]->rx_per_sec, buf1, sizeof(buf1), "/s");
-				bytes2human(args->user[i]->tx_per_sec, buf2, sizeof(buf2), "/s");
-
-				print_pair_value(out, params, "Limit RX", buf1, "Limit TX", buf2, 1);
-			} else if (args->user[i]->tx_per_sec > 0) {
-				bytes2human(args->user[i]->tx_per_sec, buf1, sizeof(buf1), "/s");
-				print_single_value(out, params, "Limit TX", buf1, 1);
-			} else if (args->user[i]->rx_per_sec > 0) {
-				bytes2human(args->user[i]->rx_per_sec, buf1, sizeof(buf1), "/s");
-				print_single_value(out, params, "Limit RX", buf1, 1);
-			}
-		}
+		if (args->user[i]->rx_per_sec > 0)
+			bytes2human(args->user[i]->rx_per_sec, buf1, sizeof(buf1), "/s");
+		else
+			strcpy(buf1, "N/A");
+		if (args->user[i]->tx_per_sec > 0)
+			bytes2human(args->user[i]->tx_per_sec, buf2, sizeof(buf1), "/s");
+		else
+			strcpy(buf2, "N/A");
+		print_pair_value(out, params, "Limit RX", buf1, "Limit TX", buf2, 1);
 
 		print_iface_stats(args->user[i]->tun, args->user[i]->conn_time, out, params, 1);
 

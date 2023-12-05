@@ -74,18 +74,18 @@ Ocserv supports the following radius attributes.
 
 ```
 #	Standard attributes
-ATTRIBUTE	User-Name		1	string
-ATTRIBUTE	Password		2	string
-ATTRIBUTE	NAS-Port		5	integer
-ATTRIBUTE	Framed-Protocol		7	integer
-ATTRIBUTE	NAS-Identifier		32	string
-ATTRIBUTE	Acct-Input-Octets	42	integer
-ATTRIBUTE	Acct-Output-Octets	43	integer
-ATTRIBUTE	Acct-Session-Id		44	string
-ATTRIBUTE	Acct-Input-Gigawords	52	integer
-ATTRIBUTE	Acct-Output-Gigawords	53	integer
-ATTRIBUTE	Acct-Interim-Interval	85	integer
-ATTRIBUTE	Connect-Info		77	string
+ATTRIBUTE	User-Name			1	string
+ATTRIBUTE	Password			2	string
+ATTRIBUTE	NAS-Port			5	integer
+ATTRIBUTE	Framed-Protocol			7	integer
+ATTRIBUTE	NAS-Identifier			32	string
+ATTRIBUTE	Acct-Input-Octets		42	integer
+ATTRIBUTE	Acct-Output-Octets		43	integer
+ATTRIBUTE	Acct-Session-Id			44	string
+ATTRIBUTE	Acct-Input-Gigawords		52	integer
+ATTRIBUTE	Acct-Output-Gigawords		53	integer
+ATTRIBUTE	Acct-Interim-Interval		85	integer
+ATTRIBUTE	Connect-Info			77	string
 
 
 ###########################
@@ -93,14 +93,14 @@ ATTRIBUTE	Connect-Info		77	string
 ###########################
 
 # sets local IPv4 address in link:
-ATTRIBUTE	NAS-IP-Address		4	ipaddr
+ATTRIBUTE	NAS-IP-Address			4	ipaddr
 # sets remote IPv4 address in link:
-ATTRIBUTE	Framed-IP-Address	8	ipaddr
-ATTRIBUTE	Framed-IP-Netmask	9	ipaddr
+ATTRIBUTE	Framed-IP-Address		8	ipaddr
+ATTRIBUTE	Framed-IP-Netmask		9	ipaddr
 
 # sets routes (quite a kludge as it requires to have
 # a CIDR string)
-ATTRIBUTE	Framed-Route		22	string
+ATTRIBUTE	Framed-Route			22	string
 
 # There are two ways to set a group, either in the
 # format "OU=group1;group2" or by a single group name
@@ -109,15 +109,15 @@ ATTRIBUTE	Framed-Route		22	string
 # Note that this works only when groupconfig is set to
 # true, and if the groups sent by the server are made known
 # to ocserv, via the select-group config variable.
-ATTRIBUTE	Class			25	string
+ATTRIBUTE	Class				25	string
 
 # sets DNS servers
 VENDOR Microsoft 311
 
 BEGIN-VENDOR Microsoft
 
-ATTRIBUTE	MS-Primary-DNS-Server 	28 	ipaddr
-ATTRIBUTE 	MS-Secondary-DNS-Server 29 	ipaddr
+ATTRIBUTE	MS-Primary-DNS-Server		28 	ipaddr
+ATTRIBUTE 	MS-Secondary-DNS-Server		29 	ipaddr
 
 END-VENDOR Microsoft
 
@@ -127,18 +127,35 @@ END-VENDOR Microsoft
 ############################
 
 # sets local IPv6 address in link:
-ATTRIBUTE	NAS-IPv6-Address	95	string
+ATTRIBUTE	NAS-IPv6-Address		95	string
 
 # sets remote IPv6 subnet in link:
-ATTRIBUTE	Delegated-IPv6-Prefix	123	ipv6prefix
+ATTRIBUTE	Delegated-IPv6-Prefix		123	ipv6prefix
 
 # sets remote IPv6 address in link:
-ATTRIBUTE	Framed-IPv6-Address	168	ipv6addr
+ATTRIBUTE	Framed-IPv6-Address		168	ipv6addr
 
 # sets DNS servers
-ATTRIBUTE	DNS-Server-IPv6-Address	169	ipv6addr
+ATTRIBUTE	DNS-Server-IPv6-Address		169	ipv6addr
 
-# Sets IPv6 routes
-ATTRIBUTE	Framed-IPv6-Prefix	97	ipv6prefix
-ATTRIBUTE	Route-IPv6-Information	170	ipv6prefix
+# sets IPv6 routes
+ATTRIBUTE	Framed-IPv6-Prefix		97	ipv6prefix
+ATTRIBUTE	Route-IPv6-Information		170	ipv6prefix
+
+
+############################
+#	Traffic shaping    #
+############################
+
+VENDOR Roaring-Penguin 10055
+
+BEGIN-VENDOR Roaring-Penguin
+
+# tx speed limit in kb/s
+ATTRIBUTE	RP-Upstream-Speed-Limit		1	integer
+# rx speed limit in kb/s
+ATTRIBUTE	RP-Downstream-Speed-Limit	2	integer
+
+END-VENDOR Roaring-Penguin
+
 ```
