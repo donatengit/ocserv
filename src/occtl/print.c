@@ -20,6 +20,7 @@
  */
 
 #include <config.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -77,7 +78,7 @@ int print_fwport_entries(FILE* out, cmd_params_st *params, const char* name, FwP
 		fprintf(out, "    \"%s\":\t[", name);
 		for (i=0;i<vsize;i++) {
 			if (val[i]->port)
-				snprintf(tmp, sizeof(tmp), "%s%s(%d)", val[i]->negate?"!":"", proto_to_str(val[i]->proto), val[i]->port);
+				snprintf(tmp, sizeof(tmp), "%s%s(%" PRIu32 ")", val[i]->negate?"!":"", proto_to_str(val[i]->proto), val[i]->port);
 			else
 				snprintf(tmp, sizeof(tmp), "%s%s()", val[i]->negate?"!":"", proto_to_str(val[i]->proto));
 
@@ -90,7 +91,7 @@ int print_fwport_entries(FILE* out, cmd_params_st *params, const char* name, FwP
 	} else {
 		for (i=0;i<vsize;i++) {
 			if (val[i]->port)
-				snprintf(tmp, sizeof(tmp), "%s%s(%d)", val[i]->negate?"!":"", proto_to_str(val[i]->proto), val[i]->port);
+				snprintf(tmp, sizeof(tmp), "%s%s(%" PRIu32 ")", val[i]->negate?"!":"", proto_to_str(val[i]->proto), val[i]->port);
 			else
 				snprintf(tmp, sizeof(tmp), "%s%s()", val[i]->negate?"!":"", proto_to_str(val[i]->proto));
 			if (i==0)

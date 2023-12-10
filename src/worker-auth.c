@@ -93,7 +93,7 @@ static const char ocv3_success_msg_foot[] = "</auth>\n";
 #define OC_LOGIN_FORM_INPUT_PASSWORD \
     "<input type=\"password\" name=\"password\" label=\""DEFAULT_PASSWD_LABEL"\" />\n"
 #define OC_LOGIN_FORM_INPUT_PASSWORD_CTR \
-    "<input type=\"password\" name=\"secondary_password\" label=\"Password%d:\" />\n"
+    "<input type=\"password\" name=\"secondary_password\" label=\"Password%u:\" />\n"
 
 #define _OCV3_LOGIN_MSG_START(x) \
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" \
@@ -247,8 +247,8 @@ int get_auth_handler2(worker_st * ws, unsigned http_ver, const char *pmsg, unsig
 
 		ret =
 		    cstp_printf(ws,
-			       "Set-Cookie: webvpncontext=%s; Max-Age=%u; Secure; HttpOnly\r\n",
-			       context, (unsigned)WSCONFIG(ws)->cookie_timeout);
+			       "Set-Cookie: webvpncontext=%s; Max-Age=%ld; Secure; HttpOnly\r\n",
+			       context, (long)WSCONFIG(ws)->cookie_timeout);
 		if (ret < 0)
 			return -1;
 
@@ -725,8 +725,8 @@ static int recv_cookie_auth_reply(worker_st * ws)
 	case AUTH__REP__FAILED:
 	default:
 		if (msg->reply != AUTH__REP__FAILED)
-			oclog(ws, LOG_ERR, "unexpected auth reply %u",
-			      (unsigned)msg->reply);
+			oclog(ws, LOG_ERR, "unexpected auth reply %d",
+			      (int)msg->reply);
 		ret = ERR_AUTH_FAIL;
 		goto cleanup;
 	}
@@ -786,8 +786,8 @@ int recv_auth_reply(worker_st * ws, int sd, char **txt, unsigned *pcounter)
 		return ret;
 	}
 
-	oclog(ws, LOG_DEBUG, "received auth reply message (value: %u)",
-	      (unsigned)msg->reply);
+	oclog(ws, LOG_DEBUG, "received auth reply message (value: %d)",
+	      (int)msg->reply);
 
 	if (txt) *txt = NULL;
 
@@ -845,8 +845,8 @@ int recv_auth_reply(worker_st * ws, int sd, char **txt, unsigned *pcounter)
 	case AUTH__REP__FAILED:
 	default:
 		if (msg->reply != AUTH__REP__FAILED)
-			oclog(ws, LOG_ERR, "unexpected auth reply %u",
-			      (unsigned)msg->reply);
+			oclog(ws, LOG_ERR, "unexpected auth reply %d",
+			      (int)msg->reply);
 		ret = ERR_AUTH_FAIL;
 		goto cleanup;
 	}
@@ -986,7 +986,7 @@ int auth_cookie(worker_st * ws, void *cookie, size_t cookie_size)
 
 int post_common_handler(worker_st * ws, unsigned http_ver, const char *imsg)
 {
-	int ret, size;
+	int ret;
 	char str_cookie[BASE64_ENCODE_RAW_LENGTH(sizeof(ws->cookie))+1];
 	size_t str_cookie_size = sizeof(str_cookie);
 	char msg[MAX_BANNER_SIZE + 32];
@@ -994,6 +994,7 @@ int post_common_handler(worker_st * ws, unsigned http_ver, const char *imsg)
 	char *success_msg_foot;
 	unsigned success_msg_head_size;
 	unsigned success_msg_foot_size;
+	unsigned size;
 
 	if (ws->req.user_agent_type == AGENT_OPENCONNECT_V3) {
 		success_msg_head = ocv3_success_msg_head;
@@ -1047,10 +1048,8 @@ int post_common_handler(worker_st * ws, unsigned http_ver, const char *imsg)
 		goto fail;
 
 	if (WSCONFIG(ws)->banner) {
-		size =
-		    snprintf(msg, sizeof(msg), "<banner>%s</banner>",
-			     WSCONFIG(ws)->banner);
-		if (size <= 0)
+		if (snprintf(msg, sizeof(msg), "<banner>%s</banner>",
+			     WSCONFIG(ws)->banner) <= 0)
 			goto fail;
 		/* snprintf() returns not a very useful value, so we need to recalculate */
 		size = strlen(msg);
@@ -1061,7 +1060,7 @@ int post_common_handler(worker_st * ws, unsigned http_ver, const char *imsg)
 
 	size += success_msg_head_size + success_msg_foot_size;
 
-	ret = cstp_printf(ws, "Content-Length: %u\r\n", (unsigned)size);
+	ret = cstp_printf(ws, "Content-Length: %u\r\n", size);
 	if (ret < 0)
 		goto fail;
 
@@ -1750,7 +1749,7 @@ int post_auth_handler(worker_st * ws, unsigned http_ver)
 		close(sd);
 	oclog(ws, LOG_HTTP_DEBUG, "HTTP sending: 401 Unauthorized");
 	ret = cstp_printf(ws,
-		   "HTTP/1.%d 401 %s\r\nContent-Length: 0\r\n\r\n",
+		   "HTTP/1.%u 401 %s\r\nContent-Length: 0\r\n\r\n",
 		   http_ver, reason);
 	if (ret >= 0)
 		cstp_fatal_close(ws, GNUTLS_A_ACCESS_DENIED);

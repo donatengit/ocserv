@@ -145,7 +145,7 @@ int post_kkdcp_handler(worker_st *ws, unsigned http_ver)
 	}
 
 	ws_add_score_to_ip(ws, WSCONFIG(ws)->ban_points_kkdcp, 0, 0);
-	oclog(ws, LOG_HTTP_DEBUG, "HTTP processing kkdcp framed request: %u bytes", (unsigned)req->body_length);
+	oclog(ws, LOG_HTTP_DEBUG, "HTTP processing kkdcp framed request: %u bytes", req->body_length);
 
 	length = BUF_SIZE;
 	buf = talloc_size(ws, length);
@@ -189,7 +189,7 @@ int post_kkdcp_handler(worker_st *ws, unsigned http_ver)
 		goto fail;
 	}
 
-	oclog(ws, LOG_HTTP_DEBUG, "HTTP sending kkdcp request: %u bytes", (unsigned)length);
+	oclog(ws, LOG_HTTP_DEBUG, "HTTP sending kkdcp request: %u bytes", length);
 	ret = send(fd, buf, length, 0);
 	if (ret != length) {
 		if (ret == -1) {
@@ -224,7 +224,8 @@ int post_kkdcp_handler(worker_st *ws, unsigned http_ver)
 		memcpy(&mlength, buf, 4);
 		mlength = ntohl(mlength);
 		if (mlength >= BUF_SIZE-4) {
-			oclog(ws, LOG_ERR, "kkdcp: too long message (%d bytes)", (int)mlength);
+			oclog(ws, LOG_ERR, "kkdcp: too long message (%" PRIu32 " bytes)",
+			      mlength);
 			reason = "kkdcp: error receiving from server";
 			goto fail;
 		}
@@ -239,7 +240,7 @@ int post_kkdcp_handler(worker_st *ws, unsigned http_ver)
 		length = ret + 4;
 	}
 
-	oclog(ws, LOG_HTTP_DEBUG, "HTTP processing kkdcp reply: %u bytes", (unsigned)length);
+	oclog(ws, LOG_HTTP_DEBUG, "HTTP processing kkdcp reply: %u bytes", length);
 
 	cstp_cork(ws);
 	ret = cstp_printf(ws, "HTTP/1.%u 200 OK\r\n", http_ver);
@@ -260,10 +261,9 @@ int post_kkdcp_handler(worker_st *ws, unsigned http_ver)
 		goto fail;
 	}
 
-	oclog(ws, LOG_HTTP_DEBUG, "HTTP sending kkdcp framed reply: %u bytes", (unsigned)length);
+	oclog(ws, LOG_HTTP_DEBUG, "HTTP sending kkdcp framed reply: %u bytes", length);
 	ret =
-	    cstp_printf(ws, "Content-Length: %u\r\n",
-		       (unsigned int)length);
+	    cstp_printf(ws, "Content-Length: %u\r\n", length);
 	if (ret < 0) {
 		goto fail;
 	}

@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/select.h>
@@ -111,7 +112,7 @@ client_entry_st *new_client_entry(sec_mod_st *sec, struct vhost_cfg_st *vhost, c
 		}
 
 		e->sid[0] = sec->sec_mod_instance_id;
-		seclog(sec, LOG_INFO, "sec-mod instance %d issue cookie", sec->sec_mod_instance_id);
+		seclog(sec, LOG_INFO, "sec-mod instance %" PRIu32 " issue cookie", sec->sec_mod_instance_id);
 
 		/* check if in use */
 		te = find_client_entry(sec, e->sid);

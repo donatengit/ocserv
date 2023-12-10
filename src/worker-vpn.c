@@ -24,6 +24,7 @@
 #include <gnutls/dtls.h>
 #include <gnutls/crypto.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -1328,7 +1329,7 @@ int periodic_check(worker_st * ws, struct timespec *tnow, unsigned dpd)
 	    now - ws->last_msg_udp > DPD_TRIES * dpd && dpd > 0) {
 		unsigned data_mtu = DATA_MTU(ws, ws->link_mtu);
 		oclog(ws, LOG_NOTICE,
-		      "have not received any UDP message or DPD for long (%d secs, DPD is %d)",
+		      "have not received any UDP message or DPD for long (%d secs, DPD is %u)",
 		      (int)(now - ws->last_msg_udp), dpd);
 
 		memset(ws->buffer+1, 0, data_mtu);
@@ -1540,7 +1541,8 @@ static int dtls_mainloop(worker_st * ws, struct dtls_st * dtls, struct timespec 
 			      ws->link_mtu, data_mtu);
 			ws->dtls_active_session++;
 			oclog(ws, LOG_DEBUG,
-				  "Main DTLS session %d active", ws->dtls_active_session);
+			      "Main DTLS session %" PRIu8 " active",
+			      ws->dtls_active_session);
 			session_info_send(ws);
 		}
 
@@ -2015,7 +2017,7 @@ static int connect_handler(worker_st * ws)
 	oclog(ws, LOG_INFO, "suggesting DPD of %d secs", ws->user_config->dpd);
 	if (ws->user_config->dpd > 0) {
 		ret =
-		    cstp_printf(ws, "X-CSTP-DPD: %u\r\n",
+		    cstp_printf(ws, "X-CSTP-DPD: %" PRIu32 "\r\n",
 			       ws->user_config->dpd);
 		SEND_ERR(ret);
 	}
@@ -2549,7 +2551,7 @@ static int parse_data(struct worker_st *ws, uint8_t *buf, size_t buf_size,
 			ret = dtls_send(DTLS_ACTIVE(ws), buf, buf_size);
 			if (ret == GNUTLS_E_LARGE_PACKET) {
 				oclog(ws, LOG_TRANSFER_DEBUG,
-				      "could not send DPD of %d bytes", (int)buf_size);
+				      "could not send DPD of %zu bytes", buf_size);
 				mtu_not_ok(ws, DTLS_ACTIVE(ws));
 				ret = dtls_send(DTLS_ACTIVE(ws), buf, 1);
 			}
@@ -2592,7 +2594,7 @@ static int parse_data(struct worker_st *ws, uint8_t *buf, size_t buf_size,
 			}
 
 			plain_size = ws->cstp_selected_comp->decompress(ws->decomp, sizeof(ws->decomp), plain, plain_size);
-			oclog(ws, LOG_DEBUG, "decompressed %d to %d\n", (int)buf_size-8, (int)plain_size);
+			oclog(ws, LOG_DEBUG, "decompressed %zu to %zd\n", buf_size-8, plain_size);
 		} else { /* DTLS */
 			if (ws->dtls_selected_comp == NULL) {
 				oclog(ws, LOG_ERR, "received compressed data but no compression was negotiated");
@@ -2600,18 +2602,18 @@ static int parse_data(struct worker_st *ws, uint8_t *buf, size_t buf_size,
 			}
 
 			plain_size = ws->dtls_selected_comp->decompress(ws->decomp, sizeof(ws->decomp), plain, plain_size);
-			oclog(ws, LOG_DEBUG, "decompressed %d to %d\n", (int)buf_size-1, (int)plain_size);
+			oclog(ws, LOG_DEBUG, "decompressed %zu to %zd\n", buf_size-1, plain_size);
 		}
 
 		if (plain_size <= 0) {
-			oclog(ws, LOG_ERR, "decompression error %d", (int)plain_size);
+			oclog(ws, LOG_ERR, "decompression error %zd", plain_size);
 			return -1;
 		}
 		plain = ws->decomp;
 		/* fall through */
 	case AC_PKT_DATA:
-		oclog(ws, LOG_TRANSFER_DEBUG, "writing %d byte(s) to TUN",
-		      (int)plain_size);
+		oclog(ws, LOG_TRANSFER_DEBUG, "writing %zd byte(s) to TUN",
+		      plain_size);
 		ret = tun_write(ws->tun_fd, plain, plain_size);
 		if (ret == -1) {
 			e = errno;
@@ -2636,12 +2638,13 @@ static int parse_data(struct worker_st *ws, uint8_t *buf, size_t buf_size,
 static int parse_cstp_data(struct worker_st *ws,
 			   uint8_t * buf, size_t buf_size, time_t now)
 {
-	int pktlen, ret;
+	unsigned pktlen;
+	int ret;
 
 	if (buf_size < 8) {
 		oclog(ws, LOG_INFO,
-		      "can't read CSTP header (only %d bytes are available)",
-		      (int)buf_size);
+		      "can't read CSTP header (only %zu bytes are available)",
+		      buf_size);
 		return -1;
 	}
 
@@ -2653,8 +2656,8 @@ static int parse_cstp_data(struct worker_st *ws,
 
 	pktlen = (buf[4] << 8) + buf[5];
 	if (buf_size != 8 + pktlen) {
-		oclog(ws, LOG_INFO, "unexpected CSTP length (have %u, should be %d)",
-		      (unsigned)pktlen, (unsigned)buf_size-8);
+		oclog(ws, LOG_INFO, "unexpected CSTP length (have %u, should be %zu)",
+		      pktlen, buf_size-8);
 		return -1;
 	}
 

@@ -21,6 +21,7 @@
  */
 
 #include <config.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -129,7 +130,8 @@ int send_cmd(struct unix_ctx *ctx, unsigned cmd, const void *data,
 		length32 = ret;
 
 		if (msg_map[cmd] != rep->cmd) {
-			fprintf(stderr, "Unexpected message '%d', expected '%d'\n", (int)rep->cmd, (int)msg_map[cmd]);
+			fprintf(stderr, "Unexpected message '%u', expected '%" PRIu8 "'\n",
+			        rep->cmd, msg_map[cmd]);
 			ret = -1;
 			goto fail;
 		}
@@ -1523,7 +1525,8 @@ int handle_events_cmd(struct unix_ctx *ctx, const char *arg, cmd_params_st *para
 		}
 
 		if (header[0] != CTL_CMD_TOP_UPDATE_REP) {
-			fprintf(stderr, "events: Unexpected message '%d', expected '%d'\n", (int)header[0], (int)CTL_CMD_TOP_UPDATE_REP);
+			fprintf(stderr, "events: Unexpected message '%" PRIu8 "', expected '%d'\n",
+			        header[0], (int)CTL_CMD_TOP_UPDATE_REP);
 			ret = -1;
 			break;
 		}
@@ -1555,7 +1558,7 @@ int handle_events_cmd(struct unix_ctx *ctx, const char *arg, cmd_params_st *para
 			common_info_cmd(rep2->user, stdout, params);
 		} else {
 			if (rep2->connected) {
-				printf("%s: connected user '%s' (%u) from %s with IP %s\n",
+				printf("%s: connected user '%s' (%" PRId32 ") from %s with IP %s\n",
 					rep2->user->user[0]->vhost,
 					rep2->user->user[0]->username,
 					rep2->user->user[0]->id,
@@ -1566,7 +1569,7 @@ int handle_events_cmd(struct unix_ctx *ctx, const char *arg, cmd_params_st *para
 				entries_add(ctx, rep2->user->user[0]->username, strlen(rep2->user->user[0]->username), rep2->user->user[0]->id);
 			} else {
 				print_time_ival7(tmpbuf, time(NULL), rep2->user->user[0]->conn_time);
-				printf("%s: disconnect user '%s' (%u) from %s with IP %s (reason: %s, time: %s)\n",
+				printf("%s: disconnect user '%s' (%" PRId32 ") from %s with IP %s (reason: %s, time: %s)\n",
 					rep2->user->user[0]->vhost,
 					rep2->user->user[0]->username,
 					rep2->user->user[0]->id,

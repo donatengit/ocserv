@@ -91,8 +91,8 @@ int check_upeer_id(const char *mod, int debug, int cfd, uid_t uid, uid_t gid, ui
 
 	if (debug >= 3)
 		syslog(LOG_DEBUG,
-		       "%s: received request from pid %u and uid %u",
-		       mod, (unsigned)cr.pid, (unsigned)cr.uid);
+		       "%s: received request from pid %d and uid %u",
+		       mod, (int)cr.pid, (unsigned)cr.uid);
 
 	if (ruid)
 		*ruid = cr.uid;
@@ -102,8 +102,8 @@ int check_upeer_id(const char *mod, int debug, int cfd, uid_t uid, uid_t gid, ui
 
 	if (cr.uid != 0 && (cr.uid != uid || cr.gid != gid)) {
 		syslog(LOG_ERR,
-		       "%s: received unauthorized request from pid %u and uid %u",
-		       mod, (unsigned)cr.pid, (unsigned)cr.uid);
+		       "%s: received unauthorized request from pid %d and uid %u",
+		       mod, (int)cr.pid, (unsigned)cr.uid);
 			return -1;
 	}
 #elif defined(HAVE_GETPEEREID)

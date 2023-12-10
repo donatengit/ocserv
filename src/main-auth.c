@@ -72,7 +72,7 @@ void put_into_cgroup(main_server_st * s, const char *_cgroup, pid_t pid)
 	p = strtok_r(cgroup, ",", &savep);
 	while (p != NULL) {
 		mslog(s, NULL, LOG_DEBUG,
-		      "putting process %u to cgroup '%s:%s'", (unsigned)pid, p,
+		      "putting process %d to cgroup '%s:%s'", (int)pid, p,
 		      name);
 
 		snprintf(file, sizeof(file), "/sys/fs/cgroup/%s/%s/tasks", p,
@@ -84,7 +84,7 @@ void put_into_cgroup(main_server_st * s, const char *_cgroup, pid_t pid)
 			return;
 		}
 
-		if (fprintf(fd, "%u", (unsigned)pid) <= 0) {
+		if (fprintf(fd, "%d", (int)pid) <= 0) {
 			mslog(s, NULL, LOG_ERR, "could not write to: %s", file);
 		}
 		fclose(fd);
