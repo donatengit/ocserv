@@ -403,7 +403,7 @@ void version(void)
 #define FLAG_LOCK (1<<1)
 #define FLAG_UNLOCK (1<<2)
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
 	int ret, c;
 	const char *username = NULL;

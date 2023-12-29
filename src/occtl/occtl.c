@@ -546,7 +546,7 @@ static int single_cmd(int argc, char **argv, void *pool, const char *file, cmd_p
 }
 
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
 	char *line = NULL;
 	CONN_TYPE *conn;
