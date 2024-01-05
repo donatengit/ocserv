@@ -294,7 +294,7 @@ clang/Fedora:
   - autoreconf -fvi
   - CC=clang ./configure --with-werror
   - make -j$JOBS
-  - make check -j$JOBS
+  - make check -j$JOBS VERBOSE=1
   tags:
   - shared
   - linux
@@ -316,7 +316,7 @@ seccomp/Fedora:
   - autoreconf -fvi
   - ./configure --with-kerberos-tests --enable-oidc-auth --with-seccomp-trap
   - make -j$JOBS
-  - make check -j$JOBS
+  - make check -j$JOBS VERBOSE=1
   tags:
   - shared
   - linux
@@ -384,7 +384,7 @@ asan/clang/Fedora:
   - autoreconf -fvi
   - CC=clang CFLAGS="-fsanitize=address -fno-optimize-sibling-calls -fno-omit-frame-pointer -g -O1" ./configure --without-pam --without-asan-broken-tests
   - make -j$JOBS
-  - make check -j$JOBS
+  - make check -j$JOBS VERBOSE=1
   tags:
   - shared
   - linux
